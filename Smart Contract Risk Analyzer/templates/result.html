@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>LexiGuard - Analysis Result</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #1f2937;
+            color: white;
+        }
+
+        .hero {
+            max-width: 900px;
+            margin: auto;
+            padding: 40px 20px;
+        }
+
+        .risk-bar {
+            width: 100%;
+            height: 28px;
+            background: #ddd;
+            border-radius: 20px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .risk-fill {
+            height: 100%;
+            text-align: center;
+            color: white;
+            font-weight: bold;
+            line-height: 28px;
+            transition: width 1s ease-in-out;
+        }
+
+        .risk-fill.green { background: #22c55e; }
+        .risk-fill.orange { background: #f97316; }
+        .risk-fill.red { background: #ef4444; }
+
+        .card {
+            background: white;
+            color: black;
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+
+        a {
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="hero">
+
+    <h1>📊 Agreement Analysis Result</h1>
+
+    {% set risk_value = (risk_score or 0) | float %}
+    {% set safe_prediction = prediction if prediction else "Unknown" %}
+    {% set safe_confidence = confidence if confidence is not none else 0 %}
+    {% set safe_sentences = sentences if sentences is not none else 0 %}
+    {% set safe_words = words if words is not none else 0 %}
+    {% set safe_characters = characters if characters is not none else 0 %}
+    {% set safe_highlighted = highlighted_text if highlighted_text else "No risky terms found." %}
+
+    {% if risk_value < 35 %}
+        {% set risk_color = "green" %}
+    {% elif risk_value < 70 %}
+        {% set risk_color = "orange" %}
+    {% else %}
+        {% set risk_color = "red" %}
+    {% endif %}
+
+    <h2>Risk Score</h2>
+    <div class="risk-bar">
+        <div class="risk-fill {{ risk_color }}" id="riskBar">
+            {{ risk_value }}%
+        </div>
+    </div>
+
+    <script>
+        window.onload = function() {
+            document.getElementById("riskBar").style.width = "{{ risk_value }}%";
+        };
+    </script>
+
+    <h2 style="margin-top:20px;">
+        🤖 AI Prediction: {{ safe_prediction }}
+    </h2>
+
+    <p><b>AI Confidence Score:</b> {{ safe_confidence }}%</p>
+
+    <!-- Stats -->
+    <div class="card">
+        <h3>📈 Text Statistics</h3>
+        <p><b>Sentences:</b> {{ safe_sentences }}</p>
+        <p><b>Words:</b> {{ safe_words }}</p>
+        <p><b>Characters:</b> {{ safe_characters }}</p>
+    </div>
+
+    
+    <div class="card">
+        <h3>🔴 Highlighted Suspicious Terms</h3>
+        <div style="max-height:300px;overflow-y:auto;">
+            {{ safe_highlighted | safe }}
+        </div>
+    </div>
+
+    <br>
+    <a href="/" style="color:white;font-size:18px;">
+        ⬅ Back to Home
+    </a>
+
+</div>
+
+</body>
+</html>
